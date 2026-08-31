@@ -153,3 +153,4 @@ class QrProfileImporterTest {
         assertFalse(QrProfileImporter.importFromRawJson("AVNC:", dao).isSuccess)
     }
 }
+

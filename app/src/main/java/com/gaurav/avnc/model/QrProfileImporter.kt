@@ -11,8 +11,8 @@ package com.gaurav.avnc.model
 import com.gaurav.avnc.model.db.ServerProfileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import java.net.URL
 
 data class AvncQrPayload(
@@ -118,3 +118,4 @@ object QrProfileImporter {
         else -> 7
     }
 }
+

@@ -12,8 +12,9 @@ import android.app.Application
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
-import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.R
+import com.gaurav.avnc.model.QrProfileImporter
+import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.util.LiveEvent
 import com.gaurav.avnc.viewmodel.service.Discovery
 
@@ -149,7 +150,7 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      * error message is announced via [qrErrorEvent].
      */
     fun importProfileFromQr(raw: String) = launchMain {
-        com.gaurav.avnc.model.QrProfileImporter.importFromRawJson(raw, serverProfileDao)
+        QrProfileImporter.importFromRawJson(raw, serverProfileDao)
                 .onSuccess {
                     profileSavedEvent.fire(it)
                     qrImportedEvent.fire(Unit)
