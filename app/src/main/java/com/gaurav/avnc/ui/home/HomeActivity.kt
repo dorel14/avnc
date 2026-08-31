@@ -33,10 +33,10 @@ import com.gaurav.avnc.util.EdgeToEdgeHelper
 import com.gaurav.avnc.util.MsgDialog
 import com.gaurav.avnc.viewmodel.HomeViewModel
 import com.gaurav.avnc.vnc.VncClient
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.barcode.Barcode
 import com.google.android.material.snackbar.Snackbar
+import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -133,13 +133,13 @@ class HomeActivity : AppCompatActivity() {
 
         runCatching { GmsBarcodeScanning.getClient(this, options) }
                 .onSuccess { scanner ->
-                scanner.startScan()
-                        .addOnSuccessListener { barcode ->
-                            val value = barcode.rawValue
-                            if (value != null) viewModel.importProfileFromQr(value)
-                            else viewModel.qrErrorEvent.fire(getString(R.string.msg_qr_import_empty))
-                        }
-                        .addOnFailureListener { showQrError(it.message ?: getString(R.string.msg_qr_import_failed)) }
+                    scanner.startScan()
+                            .addOnSuccessListener { barcode ->
+                                val value = barcode.rawValue
+                                if (value != null) viewModel.importProfileFromQr(value)
+                                else viewModel.qrErrorEvent.fire(getString(R.string.msg_qr_import_empty))
+                            }
+                            .addOnFailureListener { showQrError(it.message ?: getString(R.string.msg_qr_import_failed)) }
                 }
                 .onFailure { showQrError(it.message ?: getString(R.string.msg_qr_import_failed)) }
     }
