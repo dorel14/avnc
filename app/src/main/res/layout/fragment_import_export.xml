@@ -28,19 +28,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="@={viewModel.exportSettings}"
+            android:enabled="@{!viewModel.lockServers}"
             android:text="@string/title_export_settings" />
 
         <CheckBox
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="@={viewModel.exportProfiles}"
+            android:enabled="@{!viewModel.lockServers}"
             android:text="@string/title_export_profiles" />
 
         <CheckBox
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="@={viewModel.exportSecrets}"
-            android:enabled="@{viewModel.exportProfiles}"
+            android:enabled="@{viewModel.canExportSecrets}"
             android:text="@string/title_export_passwords_and_keys" />
 
         <Space
@@ -52,7 +54,7 @@
             android:id="@+id/export_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="@{viewModel.exportSettings || viewModel.exportProfiles}"
+            android:enabled="@{viewModel.canExport}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_export"
@@ -72,6 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="@={viewModel.deleteCurrentServerBeforeImport}"
+            android:enabled="@{!viewModel.lockServers}"
             android:paddingTop="@dimen/padding_small"
             android:text="@string/title_delete_servers_before_import" />
 
@@ -84,9 +87,11 @@
             android:id="@+id/import_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="@{!viewModel.lockServers}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_import"
             app:icon="@drawable/ic_download" />
     </LinearLayout>
 </layout>
+

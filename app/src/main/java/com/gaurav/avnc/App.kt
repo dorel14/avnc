@@ -12,6 +12,7 @@ import android.app.Application
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import com.gaurav.avnc.util.AppPreferences
+import com.gaurav.avnc.util.ManagedConfig
 
 class App : Application() {
 
@@ -21,6 +22,10 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         configureLeakCanary()
+
+        // Initialize ManagedConfig early so that its BroadcastReceiver
+        // is registered before any EMM/MDM restriction change can be missed.
+        ManagedConfig.obtain(this)
 
         prefs = AppPreferences(this)
         prefs.ui.theme.observeForever { updateNightMode(it) }

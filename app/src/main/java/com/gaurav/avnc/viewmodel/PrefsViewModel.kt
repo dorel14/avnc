@@ -12,7 +12,11 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.core.content.edit
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import com.gaurav.avnc.util.AppPreferences
 import androidx.preference.PreferenceManager
 import androidx.room.withTransaction
 import com.gaurav.avnc.R
@@ -32,6 +36,14 @@ import java.io.IOException
  */
 class PrefsViewModel(app: Application) : BaseViewModel(app) {
 
+    private val appPrefs = AppPreferences(app)
+
+    /**
+     * Returns true if server profile management is locked by EMM.
+     */
+    val lockServers: LiveData<Boolean> = appPrefs.managedRestrictions.map { restrictions ->
+        restrictions?.getBoolean("lock_servers", false) ?: false
+    }
 
     /**************************************************************************
      * Import/Export
@@ -57,12 +69,29 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
     val exportSecrets = MutableLiveData(false)
     val deleteCurrentServerBeforeImport = MutableLiveData(false)
 
+    val canExportSecrets: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
+        addSource(exportProfiles) { value = it && lockServers.value != true }
+        addSource(lockServers) { value = exportProfiles.value == true && lockServers.value != true }
+    }
+
+    val canExport: LiveData<Boolean> = MediatorLiveData<Boolean>().apply {
+        addSource(exportSettings) { value = (it || exportProfiles.value == true) && lockServers.value != true }
+        addSource(exportProfiles) { value = (exportSettings.value == true || it) && lockServers.value != true }
+        addSource(lockServers) { value = (exportSettings.value == true || exportProfiles.value == true) && lockServers.value != true }
+    }
+
     val importExportFinishedEvent = LiveEvent<Result<String>>()
 
     /**
      * Exports data to given [uri].
      */
     fun export(uri: Uri) {
+        if (lockServers.value == true) {
+            importExportFinishedEvent.fireAsync(Result.failure(
+                IllegalStateException(app.getString(R.string.msg_settings_locked))
+            ))
+            return
+        }
         val exportSettings = exportSettings.isTrue
         val exportProfiles = exportProfiles.isTrue
         val exportSecrets = exportSecrets.isTrue && exportProfiles
@@ -77,7 +106,7 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
                 )
 
                 if (!exportSecrets)
-                    scrubSecrets(data.profiles)
+                    data.profiles = scrubSecrets(data.profiles)
 
                 val json = serializer.encodeToString(data)
 
@@ -98,6 +127,12 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
      * Imports data from given [uri].
      */
     fun import(uri: Uri) {
+        if (lockServers.value == true) {
+            importExportFinishedEvent.fireAsync(Result.failure(
+                IllegalStateException(app.getString(R.string.msg_settings_locked))
+            ))
+            return
+        }
         val deleteCurrentServers = deleteCurrentServerBeforeImport.isTrue
 
         launchIO {
@@ -121,8 +156,8 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
                         }
                     } else {
                         //Reset IDs so that they don't conflict with saved profiles
-                        data.profiles.forEach { it.ID = 0 }
-                        serverProfileDao.save(data.profiles)
+                        val profiles = data.profiles.map { it.copy(ID = 0) }
+                        serverProfileDao.save(profiles)
                     }
                 }
 
@@ -174,8 +209,11 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
                         val content = element.content
                         when {
                             content == "true" || content == "false" -> putBoolean(key, content.toBoolean())
+                            content.contains('.') || content.contains('e') || content.contains('E') -> {
+                                content.toFloatOrNull()?.let { putFloat(key, it) }
+                                    ?: Log.w("PrefsViewModel", "Ignoring unknown preference: $key")
+                            }
                             content.toIntOrNull() != null -> putInt(key, content.toInt())
-                            content.toFloatOrNull() != null -> putFloat(key, content.toFloat())
                             content.toLongOrNull() != null -> putLong(key, content.toLong())
                             else -> Log.w("PrefsViewModel", "Ignoring unknown preference: $key")
                         }
@@ -187,11 +225,8 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         }
     }
 
-    private fun scrubSecrets(profiles: List<ServerProfile>) {
-        profiles.forEach {
-            it.password = ""
-            it.sshPassword = ""
-            it.sshPrivateKey = ""
+    private fun scrubSecrets(profiles: List<ServerProfile>): List<ServerProfile> =
+        profiles.map {
+            it.copy(password = "", sshPassword = "", sshPrivateKey = "")
         }
-    }
 }

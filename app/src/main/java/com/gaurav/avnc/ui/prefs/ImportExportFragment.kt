@@ -53,6 +53,12 @@ class ImportExportFragment : Fragment() {
 
         viewModel.importExportFinishedEvent.observe(viewLifecycleOwner) { handleImportExportResult(it) }
 
+        // Observe lockServers to disable import/export UI
+        viewModel.lockServers.observe(viewLifecycleOwner) { isLocked ->
+            binding.importBtn.isEnabled = !isLocked
+            binding.exportBtn.isEnabled = !isLocked
+        }
+
         authPrompt.init(
                 onSuccess = { checkNotNull(it as? Tag); start(it) },
                 onFail = { showMsg("Authentication error: $it") }

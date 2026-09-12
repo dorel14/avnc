@@ -12,17 +12,35 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceGroup
 import androidx.preference.SwitchPreference
 import com.gaurav.avnc.R
+import com.gaurav.avnc.util.AppPreferences
 import com.gaurav.avnc.util.DeviceAuthPrompt
 import com.gaurav.avnc.util.EdgeToEdgeHelper
+import com.gaurav.avnc.util.ManagedConfig
 import com.google.android.material.appbar.MaterialToolbar
 
+internal fun forEachPref(group: PreferenceGroup, action: (Preference) -> Unit) {
+    for (i in 0 until group.preferenceCount) {
+        val pref = group.getPreference(i)
+        action(pref)
+        if (pref is PreferenceGroup) {
+            forEachPref(pref, action)
+        }
+    }
+}
+
 class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+
+    private val appPrefs by lazy { AppPreferences(this) }
+    private val managedConfig = ManagedConfig.obtain(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         DeviceAuthPrompt.applyFingerprintDialogFix(supportFragmentManager)
@@ -39,6 +57,45 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
 
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Observe managed restrictions and apply UI locks
+        observeManagedRestrictions()
+    }
+
+    private fun observeManagedRestrictions() {
+        appPrefs.managedRestrictions.observe(this@PrefsActivity) { restrictions ->
+            applyManagedPrefsLock()
+        }
+    }
+
+    private fun applyManagedPrefsLock() {
+        val lockSettings = managedConfig.getManagedBoolean("lock_settings", false)
+
+        // Lock all preferences if lock_settings is true
+        supportFragmentManager.fragments.forEach { fragment ->
+            if (fragment is PrefFragment) {
+                fragment.preferenceScreen?.let { screen ->
+                    forEachPref(screen, { pref ->
+                        if (lockSettings) {
+                            pref.isEnabled = false
+                            pref.summary = getString(R.string.msg_settings_locked)
+                        } else {
+                            // Re-enable preferences that are not individually managed
+                            updatePrefEnabledState(pref)
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    private fun updatePrefEnabledState(pref: Preference) {
+        val key = pref.key ?: return
+        val isManaged = managedConfig.isManaged(key)
+        if (isManaged) {
+            pref.isEnabled = false
+            pref.summary = getString(R.string.msg_managed_by_organization)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -70,15 +127,35 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
         override fun onResume() {
             super.onResume()
             activity?.title = preferenceScreen.title
+            applyManagedPrefs()
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(prefResource, rootKey)
         }
-    }
 
-    @Keep class Main : PrefFragment(R.xml.pref_main)
-    @Keep class Appearance : PrefFragment(R.xml.pref_appearance)
+        protected fun applyManagedPrefs() {
+            val activity = activity as? PrefsActivity ?: return
+            val managedConfig = activity.managedConfig
+            val lockSettings = managedConfig.getManagedBoolean("lock_settings", false)
+
+            preferenceScreen?.let { forEachPref(it, { pref ->
+                if (pref.key != null) {
+                    val key = pref.key
+                    val isManaged = managedConfig.isManaged(key)
+
+                    if (lockSettings || isManaged) {
+                        pref.isEnabled = false
+                        if (lockSettings) {
+                            pref.summary = getString(R.string.msg_settings_locked)
+                        } else {
+                            pref.summary = getString(R.string.msg_managed_by_organization)
+                        }
+                    }
+                }
+            }) }
+        }
+    }
 
     @Keep class Viewer : PrefFragment(R.xml.pref_viewer) {
         override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,6 +216,11 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
             preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(prefChangeListener)
         }
 
+        override fun onResume() {
+            super.onResume()
+            applyManagedPrefs()
+        }
+
         private fun Preference.enableIf(test: (Map<String, Any?>) -> Boolean) {
             enablementTests += this to test
             applyTests()
@@ -180,5 +262,12 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
         }
     }
 
-    @Keep class Tools : PrefFragment(R.xml.pref_tools)
+    @Keep class Tools : PrefFragment(R.xml.pref_tools) {
+    }
+
+    @Keep class Appearance : PrefFragment(R.xml.pref_appearance) {
+    }
+
+    @Keep class Main : PrefFragment(R.xml.pref_main) {
+    }
 }
