@@ -307,38 +307,6 @@
     <string name="restriction_lock_servers_title">Lock server profiles</string>
     <string name="restriction_lock_servers_desc">Prevents the user from modifying or importing/exporting server profiles. Values: true (locked), false (editable).</string>
 
-    <string name="restriction_managed_servers_title">Managed servers</string>
-    <string name="restriction_managed_servers_desc">List of server profiles managed by your organization. Do not edit.</string>
-    <string name="restriction_server_bundle_title">Managed server</string>
-    <string name="restriction_server_bundle_desc">Configuration for one server profile managed by your organization.</string>
-
-    <string name="restriction_server_id_title">Server ID</string>
-    <string name="restriction_server_id_desc">Stable identifier for this server profile.</string>
-    <string name="restriction_server_name_title">Server name</string>
-    <string name="restriction_server_name_desc">Display name of the server.</string>
-    <string name="restriction_server_host_title">Server host</string>
-    <string name="restriction_server_host_desc">Internet address of the server (hostname or IP).</string>
-    <string name="restriction_server_port_title">Server port</string>
-    <string name="restriction_server_port_desc">Port number. Default: 5900.</string>
-    <string name="restriction_server_security_title">Security type</string>
-    <string name="restriction_server_security_desc">Security type to use for connection.</string>
-    <string name="restriction_server_channel_title">Channel type</string>
-    <string name="restriction_server_channel_desc">Transport channel (TCP or SSH tunnel).</string>
-    <string name="restriction_server_ssh_host_title">SSH host</string>
-    <string name="restriction_server_ssh_host_desc">SSH server host. Optional.</string>
-    <string name="restriction_server_ssh_port_title">SSH port</string>
-    <string name="restriction_server_ssh_port_desc">SSH server port. Default: 22.</string>
-    <string name="restriction_server_ssh_username_title">SSH username</string>
-    <string name="restriction_server_ssh_username_desc">Username for SSH authentication.</string>
-    <string name="restriction_server_ssh_auth_title">SSH authentication</string>
-    <string name="restriction_server_ssh_auth_desc">SSH authentication method (key or password).</string>
-    <string name="restriction_server_username_title">Username</string>
-    <string name="restriction_server_username_desc">Username for VNC authentication.</string>
-    <string name="restriction_server_view_only_title">View only</string>
-    <string name="restriction_server_view_only_desc">If true, connection is view-only (no input).</string>
-
-    <string name="desc_managed_profile">Managed by your organization</string>
-
     <string name="msg_settings_locked">Settings locked by administrator</string>
 
     <string name="msg_managed_by_organization">Managed by your organization</string>
