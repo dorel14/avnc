@@ -12,7 +12,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.gaurav.avnc.model.ServerProfile
@@ -60,43 +59,6 @@ interface ServerProfileDao {
 
     @Delete
     suspend fun delete(profile: ServerProfile)
-
-    @Query("SELECT * FROM profiles WHERE isManaged = 1")
-    suspend fun getManagedProfiles(): List<ServerProfile>
-
-    @Transaction
-    suspend fun replaceManagedProfiles(profiles: List<ServerProfile>) {
-        val existing = getManagedProfiles()
-        val existingByManagedId = existing.associateBy { it.managedId }
-
-        val incomingManagedIds = profiles.mapNotNull { it.managedId }.toSet()
-
-        // Delete managed profiles no longer in EMM list
-        for (p in existing) {
-            if (p.managedId !in incomingManagedIds) {
-                delete(p)
-            }
-        }
-
-        // Insert or update incoming profiles
-        for (p in profiles) {
-            val current = existingByManagedId[p.managedId]
-            if (current != null) {
-                // Preserve local state, update EMM-controlled fields
-                p.ID = current.ID
-                p.isManaged = current.isManaged
-                p.managedId = current.managedId
-                p.useCount = current.useCount
-                p.sshPrivateKey = current.sshPrivateKey
-                update(p)
-            } else {
-                save(p)
-            }
-        }
-    }
-
-    @Query("UPDATE profiles SET useCount = :useCount, zoom1 = :zoom1, zoom2 = :zoom2 WHERE ID = :id")
-    suspend fun saveManagedRuntimeState(id: Long, useCount: Int, zoom1: Float, zoom2: Float)
 
     @Query("DELETE FROM profiles")
     suspend fun deleteAll()

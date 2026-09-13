@@ -79,13 +79,6 @@
 
                 <ImageView
                     style="@style/ServerCardHintIcon"
-                    android:importantForAccessibility="yes"
-                    android:src="@drawable/ic_lock"
-                    app:isVisible="@{profile.isManaged}"
-                    android:contentDescription="@string/desc_managed_profile" />
-
-                <ImageView
-                    style="@style/ServerCardHintIcon"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_ssh"
                     app:isVisible="@{profile.channelType == ServerProfile.CHANNEL_SSH_TUNNEL}" />

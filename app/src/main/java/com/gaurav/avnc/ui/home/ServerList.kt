@@ -100,7 +100,7 @@ private class ServerListViewHolder(val serverList: ServerList, val binding: Serv
     : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        binding.root.setOnCreateContextMenuListener { menu, _, _ -> binding.profile?.let { prepareContextMenu(menu, it) } }
+        binding.root.setOnCreateContextMenuListener { menu, _, _ -> prepareContextMenu(menu) }
         binding.root.setOnClickListener { invokeAction(serverList.onServerClick) }
         binding.saveBtn.setOnClickListener { invokeAction(serverList.onSaveServer) }
     }
@@ -110,14 +110,12 @@ private class ServerListViewHolder(val serverList: ServerList, val binding: Serv
         serverList.indicatorSource?.let { binding.indicator.setup(profile, it) }
     }
 
-    private fun prepareContextMenu(menu: ContextMenu, profile: ServerProfile) {
-        if (!profile.isManaged) {
-            prepareContextMenuItem(menu, serverList.onEditServer, R.string.title_edit)
-            prepareContextMenuItem(menu, serverList.onDeleteServer, R.string.title_delete)
-        }
+    private fun prepareContextMenu(menu: ContextMenu) {
+        prepareContextMenuItem(menu, serverList.onEditServer, R.string.title_edit)
         prepareContextMenuItem(menu, serverList.onDuplicateServer, R.string.title_duplicate)
         prepareContextMenuItem(menu, serverList.onCopyServerName, R.string.title_copy_name)
         prepareContextMenuItem(menu, serverList.onCopyServerHost, R.string.title_copy_host)
+        prepareContextMenuItem(menu, serverList.onDeleteServer, R.string.title_delete)
     }
 
     private fun prepareContextMenuItem(menu: ContextMenu, action: ServerListItemAction?, titleRes: Int) {
