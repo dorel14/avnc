@@ -91,6 +91,7 @@ class IntentReceiverActivity : AppCompatActivity() {
     private suspend fun findAndMergeMatchingProfile(uri: VncUri): ServerProfile? {
         return uri.connectionNameForProfile
                 ?.let { profileDao.getByName(it).firstOrNull() }
+                ?.takeIf { !it.isManaged }
                 ?.let { uri.applyToProfile(it) }
     }
 
@@ -100,6 +101,8 @@ class IntentReceiverActivity : AppCompatActivity() {
 
         val profile = findAndMergeMatchingProfile(uri) ?: uri.toServerProfile()
         if (profile.host.isBlank())
+            return
+        if (profile.isManaged)
             return
 
         val id = profileDao.save(profile)

@@ -25,6 +25,7 @@ class ManagedConfig private constructor(context: Context) {
     private val restrictionManager: RestrictionsManager =
         appContext.getSystemService(Context.RESTRICTIONS_SERVICE) as RestrictionsManager
 
+    @Volatile
     private var _restrictions: Bundle = restrictionManager.getApplicationRestrictions()
 
     private val _restrictionsChanged = MutableLiveData<Bundle?>(null)

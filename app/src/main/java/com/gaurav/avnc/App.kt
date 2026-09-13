@@ -11,8 +11,13 @@ package com.gaurav.avnc
 import android.app.Application
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.gaurav.avnc.util.AppPreferences
 import com.gaurav.avnc.util.ManagedConfig
+import com.gaurav.avnc.util.ManagedServerSync
+import com.gaurav.avnc.model.db.MainDb
 
 class App : Application() {
 
@@ -23,9 +28,16 @@ class App : Application() {
         super.onCreate()
         configureLeakCanary()
 
-        // Initialize ManagedConfig early so that its BroadcastReceiver
-        // is registered before any EMM/MDM restriction change can be missed.
         ManagedConfig.obtain(this)
+        MainDb.getInstance(this).let { db ->
+            ManagedServerSync.initialize(this, db)
+            val owner = ProcessLifecycleOwner.get()
+            ManagedConfig.obtain(this).restrictionsChanged.observe(owner, Observer { bundle ->
+                if (bundle != null) {
+                    ManagedServerSync.scheduleSync(this, db)
+                }
+            })
+        }
 
         prefs = AppPreferences(this)
         prefs.ui.theme.observeForever { updateNightMode(it) }

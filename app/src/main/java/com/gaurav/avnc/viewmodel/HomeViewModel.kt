@@ -125,13 +125,16 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
         if (lockServers.value != true) editProfileEvent.fire(source.copy(ID = 0))
     }
     fun onEditProfile(profile: ServerProfile) {
-        if (lockServers.value != true) editProfileEvent.fire(profile.copy())
+        if (lockServers.value != true && !profile.isManaged) editProfileEvent.fire(profile.copy())
     }
 
     fun onDuplicateProfile(profile: ServerProfile) {
-        if (lockServers.value != true) {
+        if (lockServers.value != true || profile.isManaged) {
             val duplicate = profile.copy(ID = 0)
             duplicate.name += " (Copy)"
+            duplicate.isManaged = false
+            duplicate.managedId = null
+            duplicate.useCount = 0
             editProfileEvent.fire(duplicate)
         }
     }
@@ -143,14 +146,14 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      **************************************************************************/
 
     fun saveProfile(profile: ServerProfile) = launchMain {
-        if (lockServers.value != true) {
+        if (lockServers.value != true && !profile.isManaged) {
             serverProfileDao.save(profile)
             profileSavedEvent.fire(profile)
         }
     }
 
     fun deleteProfile(profile: ServerProfile) = launchMain {
-        if (lockServers.value != true) {
+        if (lockServers.value != true && !profile.isManaged) {
             serverProfileDao.delete(profile)
             profileDeletedEvent.fire(profile)
         }
