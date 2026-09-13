@@ -227,4 +227,42 @@
         <item>Item 2</item>
         <item>Item 3</item>
     </string-array>
+
+    <!--Values for channel types in managed server restrictions-->
+    <string-array name="restriction_channel_type_entries">
+        <item>TCP</item>
+        <item>SSH tunnel</item>
+    </string-array>
+    <string-array name="restriction_channel_type_values">
+        <item>tcp</item>
+        <item>ssh-tunnel</item>
+    </string-array>
+
+    <!--Values for security types in managed server restrictions-->
+    <string-array name="restriction_security_type_entries">
+        <item>@string/title_automatic</item>
+        <item>@string/title_none</item>
+        <item>VncAuth</item>
+        <item>AnonTLS</item>
+        <item>VeNCrypt</item>
+        <item>macOS</item>
+    </string-array>
+    <string-array name="restriction_security_type_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>18</item>
+        <item>19</item>
+        <item>30</item>
+    </string-array>
+
+    <!--Values for SSH auth types in managed server restrictions-->
+    <string-array name="restriction_ssh_auth_type_entries">
+        <item>Key</item>
+        <item>Password</item>
+    </string-array>
+    <string-array name="restriction_ssh_auth_type_values">
+        <item>key</item>
+        <item>password</item>
+    </string-array>
 </resources>

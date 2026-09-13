@@ -249,7 +249,13 @@ class VncViewModel(app: Application) : BaseViewModel(app) {
      */
     fun saveProfile() {
         if (profile.isSaved())
-            launchMain { serverProfileDao.update(profile) }
+            launchMain {
+                if (profile.isManaged) {
+                    serverProfileDao.saveManagedRuntimeState(profile.ID, profile.useCount, profile.zoom1, profile.zoom2)
+                } else {
+                    serverProfileDao.update(profile)
+                }
+            }
     }
 
     suspend fun getProfileById(id: Long) = serverProfileDao.getByID(id)

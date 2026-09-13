@@ -110,4 +110,68 @@
         android:restrictionType="bool"
         android:defaultValue="false" />
 
+    <restriction
+        android:key="managed_servers"
+        android:title="@string/restriction_managed_servers_title"
+        android:description="@string/restriction_managed_servers_desc"
+        android:restrictionType="bundle_array">
+
+        <restriction
+            android:key="managed_server"
+            android:restrictionType="bundle"
+            android:title="@string/restriction_server_bundle_title"
+            android:description="@string/restriction_server_bundle_desc">
+
+            <restriction android:key="id" android:restrictionType="string"
+                android:title="@string/restriction_server_id_title"
+                android:description="@string/restriction_server_id_desc" />
+            <restriction android:key="name" android:restrictionType="string"
+                android:title="@string/restriction_server_name_title"
+                android:description="@string/restriction_server_name_desc" />
+            <restriction android:key="host" android:restrictionType="string"
+                android:title="@string/restriction_server_host_title"
+                android:description="@string/restriction_server_host_desc" />
+            <restriction android:key="port" android:restrictionType="integer"
+                android:defaultValue="5900"
+                android:title="@string/restriction_server_port_title"
+                android:description="@string/restriction_server_port_desc" />
+            <restriction android:key="security_type" android:restrictionType="choice"
+                android:entries="@array/restriction_security_type_entries"
+                android:entryValues="@array/restriction_security_type_values"
+                android:defaultValue="0"
+                android:title="@string/restriction_server_security_title"
+                android:description="@string/restriction_server_security_desc" />
+            <restriction android:key="channel_type" android:restrictionType="choice"
+                android:entries="@array/restriction_channel_type_entries"
+                android:entryValues="@array/restriction_channel_type_values"
+                android:defaultValue="tcp"
+                android:title="@string/restriction_server_channel_title"
+                android:description="@string/restriction_server_channel_desc" />
+            <restriction android:key="ssh_host" android:restrictionType="string"
+                android:title="@string/restriction_server_ssh_host_title"
+                android:description="@string/restriction_server_ssh_host_desc" />
+            <restriction android:key="ssh_port" android:restrictionType="integer"
+                android:defaultValue="22"
+                android:title="@string/restriction_server_ssh_port_title"
+                android:description="@string/restriction_server_ssh_port_desc" />
+            <restriction android:key="ssh_username" android:restrictionType="string"
+                android:title="@string/restriction_server_ssh_username_title"
+                android:description="@string/restriction_server_ssh_username_desc" />
+            <restriction android:key="ssh_auth_type" android:restrictionType="choice"
+                android:entries="@array/restriction_ssh_auth_type_entries"
+                android:entryValues="@array/restriction_ssh_auth_type_values"
+                android:defaultValue="key"
+                android:title="@string/restriction_server_ssh_auth_title"
+                android:description="@string/restriction_server_ssh_auth_desc" />
+            <restriction android:key="username" android:restrictionType="string"
+                android:title="@string/restriction_server_username_title"
+                android:description="@string/restriction_server_username_desc" />
+            <restriction android:key="view_only" android:restrictionType="bool"
+                android:defaultValue="false"
+                android:title="@string/restriction_server_view_only_title"
+                android:description="@string/restriction_server_view_only_desc" />
+
+        </restriction>
+    </restriction>
+
 </restrictions>
