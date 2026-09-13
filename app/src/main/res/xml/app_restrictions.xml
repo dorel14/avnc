@@ -72,42 +72,42 @@
         android:key="keep_screen_on"
         android:title="@string/restriction_keep_screen_on_title"
         android:description="@string/restriction_keep_screen_on_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="true" />
 
     <restriction
         android:key="fullscreen_display"
         android:title="@string/restriction_fullscreen_display_title"
         android:description="@string/restriction_fullscreen_display_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="true" />
 
     <restriction
         android:key="auto_reconnect"
         android:title="@string/restriction_auto_reconnect_title"
         android:description="@string/restriction_auto_reconnect_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="false" />
 
     <restriction
         android:key="lock_saved_server"
         android:title="@string/restriction_lock_saved_server_title"
         android:description="@string/restriction_lock_saved_server_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="false" />
 
     <restriction
         android:key="lock_settings"
         android:title="@string/restriction_lock_settings_title"
         android:description="@string/restriction_lock_settings_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="false" />
 
     <restriction
         android:key="lock_servers"
         android:title="@string/restriction_lock_servers_title"
         android:description="@string/restriction_lock_servers_desc"
-        android:restrictionType="boolean"
+        android:restrictionType="bool"
         android:defaultValue="false" />
 
 </restrictions>
