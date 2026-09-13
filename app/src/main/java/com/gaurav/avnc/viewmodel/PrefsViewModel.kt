@@ -46,6 +46,8 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
      */
     val lockServers: LiveData<Boolean> = appPrefs.managedRestrictions.map { restrictions ->
         restrictions?.getBoolean("lock_servers", false) ?: false
+    }
+
     private companion object {
         const val TIMEOUT_MS = 10_000
         const val MAX_RESPONSE_BYTES = 1024 * 1024
@@ -103,17 +105,16 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         val exportSecrets = exportSecrets.isTrue && exportProfiles
         debugCheck(exportSettings || exportProfiles)
 
-        launchIO {
-            runCatching {
-                // Serialize
-                val data = Container(
-                        profiles = if (exportProfiles) serverProfileDao.getList() else emptyList(),
-                        preferences = if (exportSettings) collectPreferences() else emptyMap()
-                )
-
-                if (!exportSecrets)
-                    data.profiles = scrubSecrets(data.profiles)
         launchImportExport {
+            // Serialize
+            val data = Container(
+                    profiles = if (exportProfiles) serverProfileDao.getList() else emptyList(),
+                    preferences = if (exportSettings) collectPreferences() else emptyMap()
+            )
+
+            if (!exportSecrets)
+                data.profiles = scrubSecrets(data.profiles)
+
             val json = exportJson()
 
             // Write out
@@ -121,7 +122,7 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
                 stream.writer().use { it.write(json) }
             } ?: throw IOException("Unable to write the file.")
 
-            app.getString(R.string.msg_exported)
+            return@launchImportExport app.getString(R.string.msg_exported)
         }
     }
 
@@ -149,10 +150,6 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         }
         val deleteCurrentServers = deleteCurrentServerBeforeImport.isTrue
 
-        launchIO {
-            runCatching {
-
-                val json = app.contentResolver.openInputStream(uri)?.use { stream ->
         launchImportExport {
             val json = when (uri.scheme) {
                 "http", "https" -> readFromNetwork(uri)
@@ -163,22 +160,10 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
 
             importJson(json)
 
-            app.getString(R.string.msg_imported)
+            return@launchImportExport app.getString(R.string.msg_imported)
         }
     }
 
-                //Update database
-                if (data.profiles.isNotEmpty()) {
-                    if (deleteCurrentServers) {
-                        db.withTransaction {
-                            serverProfileDao.deleteAll()
-                            serverProfileDao.save(data.profiles)
-                        }
-                    } else {
-                        //Reset IDs so that they don't conflict with saved profiles
-                        val profiles = data.profiles.map { it.copy(ID = 0) }
-                        serverProfileDao.save(profiles)
-                    }
     /**
      * Reads the entire body of an http/https [uri] into a String.
      */

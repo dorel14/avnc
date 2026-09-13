@@ -84,6 +84,7 @@ class ImportExportFragment : Fragment() {
         viewModel.lockServers.observe(viewLifecycleOwner) { isLocked ->
             binding.importBtn.isEnabled = !isLocked
             binding.exportBtn.isEnabled = !isLocked
+        }
         childFragmentManager.setFragmentResultListener(REQUEST_IMPORT_URI, viewLifecycleOwner) { _, bundle ->
             val uri = BundleCompat.getParcelable(bundle, KEY_IMPORT_URI, Uri::class.java)
                     ?: return@setFragmentResultListener
