@@ -118,7 +118,9 @@
 
         <restriction
             android:key="managed_server"
-            android:restrictionType="bundle">
+            android:restrictionType="bundle"
+            android:title="@string/restriction_server_bundle_title"
+            android:description="@string/restriction_server_bundle_desc">
 
             <restriction android:key="id" android:restrictionType="string"
                 android:title="@string/restriction_server_id_title"

@@ -309,6 +309,8 @@
 
     <string name="restriction_managed_servers_title">Managed servers</string>
     <string name="restriction_managed_servers_desc">List of server profiles managed by your organization. Do not edit.</string>
+    <string name="restriction_server_bundle_title">Managed server</string>
+    <string name="restriction_server_bundle_desc">Configuration for one server profile managed by your organization.</string>
 
     <string name="restriction_server_id_title">Server ID</string>
     <string name="restriction_server_id_desc">Stable identifier for this server profile.</string>
