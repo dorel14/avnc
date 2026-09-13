@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025  Gaurav Ujjwal.
+  ~
+  ~ SPDX-License-Identifier:  GPL-3.0-or-later
+  ~
+  ~ See COPYING.txt for more details.
+  -->
+<!--
+  Managed configuration schema for EMM/MDM solutions (Intune, WizyEMM,
+  Workspace ONE, ...).
+
+  Each restriction maps 1:1 onto an existing AVNC preference key.
+  The android:defaultValue values must match the AVNC defaults so that
+  an EMM which does not push a value still behaves as expected.
+-->
+<restrictions xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <restriction
+        android:key="screen_orientation"
+        android:title="@string/restriction_screen_orientation_title"
+        android:description="@string/restriction_screen_orientation_desc"
+        android:restrictionType="choice"
+        android:defaultValue="auto"
+        android:entries="@array/orientation_entries"
+        android:entryValues="@array/orientation_values" />
+
+    <restriction
+        android:key="scroll_mode"
+        android:title="@string/restriction_scroll_mode_title"
+        android:description="@string/restriction_scroll_mode_desc"
+        android:restrictionType="choice"
+        android:defaultValue="touchscreen"
+        android:entries="@array/gesture_style_entries"
+        android:entryValues="@array/gesture_style_values" />
+
+    <restriction
+        android:key="scroll_sensitivity"
+        android:title="@string/restriction_scroll_sensitivity_title"
+        android:description="@string/restriction_scroll_sensitivity_desc"
+        android:restrictionType="integer"
+        android:defaultValue="10" />
+
+    <restriction
+        android:key="tap2_action"
+        android:title="@string/restriction_tap2_action_title"
+        android:description="@string/restriction_tap2_action_desc"
+        android:restrictionType="choice"
+        android:defaultValue="open-keyboard"
+        android:entries="@array/tap2_action_entries"
+        android:entryValues="@array/tap2_action_values" />
+
+    <restriction
+        android:key="swipe1_action"
+        android:title="@string/restriction_swipe1_action_title"
+        android:description="@string/restriction_swipe1_action_desc"
+        android:restrictionType="choice"
+        android:defaultValue="pan"
+        android:entries="@array/swipe1_action_entries"
+        android:entryValues="@array/swipe1_action_values" />
+
+    <restriction
+        android:key="swipe2_action"
+        android:title="@string/restriction_swipe2_action_title"
+        android:description="@string/restriction_swipe2_action_desc"
+        android:restrictionType="choice"
+        android:defaultValue="pan"
+        android:entries="@array/swipe2_action_entries"
+        android:entryValues="@array/swipe2_action_values" />
+
+    <restriction
+        android:key="keep_screen_on"
+        android:title="@string/restriction_keep_screen_on_title"
+        android:description="@string/restriction_keep_screen_on_desc"
+        android:restrictionType="bool"
+        android:defaultValue="true" />
+
+    <restriction
+        android:key="fullscreen_display"
+        android:title="@string/restriction_fullscreen_display_title"
+        android:description="@string/restriction_fullscreen_display_desc"
+        android:restrictionType="bool"
+        android:defaultValue="true" />
+
+    <restriction
+        android:key="auto_reconnect"
+        android:title="@string/restriction_auto_reconnect_title"
+        android:description="@string/restriction_auto_reconnect_desc"
+        android:restrictionType="bool"
+        android:defaultValue="false" />
+
+    <restriction
+        android:key="lock_saved_server"
+        android:title="@string/restriction_lock_saved_server_title"
+        android:description="@string/restriction_lock_saved_server_desc"
+        android:restrictionType="bool"
+        android:defaultValue="false" />
+
+    <restriction
+        android:key="lock_settings"
+        android:title="@string/restriction_lock_settings_title"
+        android:description="@string/restriction_lock_settings_desc"
+        android:restrictionType="bool"
+        android:defaultValue="false" />
+
+    <restriction
+        android:key="lock_servers"
+        android:title="@string/restriction_lock_servers_title"
+        android:description="@string/restriction_lock_servers_desc"
+        android:restrictionType="bool"
+        android:defaultValue="false" />
+
+</restrictions>

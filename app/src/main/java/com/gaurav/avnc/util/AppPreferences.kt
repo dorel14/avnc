@@ -9,9 +9,11 @@
 package com.gaurav.avnc.util
 
 import android.content.Context
+import android.os.Bundle
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import kotlin.reflect.KProperty
 
@@ -21,6 +23,13 @@ import kotlin.reflect.KProperty
 class AppPreferences(context: Context) {
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private val managedConfig = ManagedConfig.obtain(context)
+
+    /**
+     * [LiveData] of the current managed restrictions. Null when no restriction has been pushed.
+     */
+    val managedRestrictions: LiveData<Bundle?>
+        get() = managedConfig.restrictionsChanged
 
     inner class UI {
         val theme = StringLivePref("theme", "system")
@@ -30,11 +39,11 @@ class AppPreferences(context: Context) {
     }
 
     inner class Viewer {
-        val orientation; get() = prefs.getString("viewer_orientation", "auto")
-        val fullscreen; get() = prefs.getBoolean("fullscreen_display", true)
+        val orientation; get() = managedConfig.getManagedString("screen_orientation", prefs.getString("viewer_orientation", "auto"))
+        val fullscreen; get() = managedConfig.getManagedBoolean("fullscreen_display", prefs.getBoolean("fullscreen_display", true))
         val pipEnabled; get() = prefs.getBoolean("pip_enabled", false)
         val drawBehindCutout; get() = fullscreen && prefs.getBoolean("viewer_draw_behind_cutout", false)
-        val keepScreenOn; get() = prefs.getBoolean("keep_screen_on", true)
+        val keepScreenOn; get() = managedConfig.getManagedBoolean("keep_screen_on", prefs.getBoolean("keep_screen_on", true))
         val toolbarAlignment; get() = prefs.getString("toolbar_alignment", "start")
         val toolbarOpenWithSwipe; get() = prefs.getBoolean("toolbar_open_with_swipe", true)
         val toolbarOpenWithButton; get() = prefs.getBoolean("toolbar_open_with_button", false)
@@ -46,20 +55,20 @@ class AppPreferences(context: Context) {
     }
 
     inner class Gesture {
-        val style; get() = prefs.getString("gesture_style", "touchscreen")!!
+        val style; get() = managedConfig.getManagedString("scroll_mode", prefs.getString("gesture_style", "touchscreen"))!!
         val tap1 = "left-click" //Preference UI was removed
-        val tap2; get() = prefs.getString("gesture_tap2", "open-keyboard")!!
+        val tap2; get() = managedConfig.getManagedString("tap2_action", prefs.getString("gesture_tap2", "open-keyboard"))!!
         val tap3; get() = prefs.getString("gesture_tap3", "none")!!
         val doubleTap; get() = prefs.getString("gesture_double_tap", "double-click")!!
         val longPress; get() = prefs.getString("gesture_long_press", "right-click")!!
-        val swipe1; get() = prefs.getString("gesture_swipe1", "pan")!!
-        val swipe2; get() = prefs.getString("gesture_swipe2", "pan")!!
+        val swipe1; get() = managedConfig.getManagedString("swipe1_action", prefs.getString("gesture_swipe1", "pan"))!!
+        val swipe2; get() = managedConfig.getManagedString("swipe2_action", prefs.getString("gesture_swipe2", "pan"))!!
         val swipe3; get() = prefs.getString("gesture_swipe3", "pan")!!
         val doubleTapSwipe; get() = prefs.getString("gesture_double_tap_swipe", "remote-drag")!!
         val longPressSwipe; get() = prefs.getString("gesture_long_press_swipe", "none")!!
         val longPressSwipeEnabled; get() = (longPressSwipe != "none" && longPress != "left-press")
         val longPressDetectionEnabled; get() = (longPress != "none" || longPressSwipeEnabled)
-        val swipeSensitivity; get() = prefs.getInt("gesture_swipe_sensitivity", 10) / 10f
+        val swipeSensitivity; get() = managedConfig.getManagedInt("scroll_sensitivity", prefs.getInt("gesture_swipe_sensitivity", 10)) / 10f
         val invertVerticalScrolling; get() = prefs.getBoolean("invert_vertical_scrolling", false)
         val quickTap1Enabled; get() = ((doubleTap == "none" || doubleTap == "double-click") && doubleTapSwipe == "none")
     }
@@ -87,10 +96,12 @@ class AppPreferences(context: Context) {
 
     inner class Server {
         val clipboardSync; get() = prefs.getBoolean("clipboard_sync", true)
-        val lockSavedServer; get() = prefs.getBoolean("lock_saved_server", false)
-        val autoReconnect; get() = prefs.getBoolean("auto_reconnect", false)
+        val lockSavedServer; get() = managedConfig.getManagedBoolean("lock_saved_server", prefs.getBoolean("lock_saved_server", false))
+        val autoReconnect; get() = managedConfig.getManagedBoolean("auto_reconnect", prefs.getBoolean("auto_reconnect", false))
         val discoveryAutorun; get() = prefs.getBoolean("discovery_autorun", true)
         val rediscoveryIndicator = BooleanLivePref("rediscovery_indicator", true)
+        val lockSettings; get() = managedConfig.getManagedBoolean("lock_settings", false)
+        val lockServers; get() = managedConfig.getManagedBoolean("lock_servers", false)
     }
 
     /**

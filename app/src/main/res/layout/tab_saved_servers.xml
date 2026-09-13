@@ -12,6 +12,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.gaurav.avnc.viewmodel.HomeViewModel" />
@@ -46,6 +48,8 @@
             android:layout_margin="@dimen/margin_normal"
             android:contentDescription="@string/desc_add_new_server_btn"
             android:onClick="@{()-> viewModel.onNewProfile()}"
+            android:enabled="@{!viewModel.lockServers}"
+            android:visibility="@{viewModel.lockServers ? View.GONE : View.VISIBLE}"
             android:src="@drawable/ic_plus" />
     </FrameLayout>
 </layout>

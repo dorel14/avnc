@@ -9,14 +9,26 @@
 package com.gaurav.avnc.viewmodel
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.gaurav.avnc.model.ServerProfile
+import com.gaurav.avnc.util.AppPreferences
 import com.gaurav.avnc.util.LiveEvent
 import com.gaurav.avnc.viewmodel.service.Discovery
 
 class HomeViewModel(app: Application) : BaseViewModel(app) {
+
+    private val appPrefs = AppPreferences(app)
+
+    /**
+     * Returns true if server profile management is locked by EMM.
+     */
+    val lockServers: LiveData<Boolean> = appPrefs.managedRestrictions.map { restrictions ->
+        restrictions?.getBoolean("lock_servers", false) ?: false
+    }
 
     /**
      * [ServerProfile]s stored in database.
@@ -30,7 +42,7 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
     }
 
     /**
-     * Used to find new servers.
+     * Used for finding new servers.
      */
     val discovery = Discovery
 
@@ -106,14 +118,22 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      * given to [editProfileEvent] can be modified by the editor.
      **************************************************************************/
 
-    fun onNewProfile() = editProfileEvent.fire(ServerProfile())
-    fun onNewProfile(source: ServerProfile) = editProfileEvent.fire(source.copy(ID = 0))
-    fun onEditProfile(profile: ServerProfile) = editProfileEvent.fire(profile.copy())
+    fun onNewProfile() {
+        if (lockServers.value != true) editProfileEvent.fire(ServerProfile())
+    }
+    fun onNewProfile(source: ServerProfile) {
+        if (lockServers.value != true) editProfileEvent.fire(source.copy(ID = 0))
+    }
+    fun onEditProfile(profile: ServerProfile) {
+        if (lockServers.value != true) editProfileEvent.fire(profile.copy())
+    }
 
     fun onDuplicateProfile(profile: ServerProfile) {
-        val duplicate = profile.copy(ID = 0)
-        duplicate.name += " (Copy)"
-        editProfileEvent.fire(duplicate)
+        if (lockServers.value != true) {
+            val duplicate = profile.copy(ID = 0)
+            duplicate.name += " (Copy)"
+            editProfileEvent.fire(duplicate)
+        }
     }
 
     /**************************************************************************
@@ -123,13 +143,17 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      **************************************************************************/
 
     fun saveProfile(profile: ServerProfile) = launchMain {
-        serverProfileDao.save(profile)
-        profileSavedEvent.fire(profile)
+        if (lockServers.value != true) {
+            serverProfileDao.save(profile)
+            profileSavedEvent.fire(profile)
+        }
     }
 
     fun deleteProfile(profile: ServerProfile) = launchMain {
-        serverProfileDao.delete(profile)
-        profileDeletedEvent.fire(profile)
+        if (lockServers.value != true) {
+            serverProfileDao.delete(profile)
+            profileDeletedEvent.fire(profile)
+        }
     }
 
     /**************************************************************************

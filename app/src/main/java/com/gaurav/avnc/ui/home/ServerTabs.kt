@@ -103,9 +103,14 @@ class ServerTabs(val activity: HomeActivity) {
         binding.viewModel = viewModel
 
         binding.servers.onServerClick = { viewModel.startConnection(it) }
-        binding.servers.onEditServer = { viewModel.onEditProfile(it) }
-        binding.servers.onDuplicateServer = { viewModel.onDuplicateProfile(it) }
-        binding.servers.onDeleteServer = { viewModel.deleteProfile(it) }
+
+        // Only allow edit/duplicate/delete if not locked by EMM
+        if (viewModel.lockServers.value != true) {
+            binding.servers.onEditServer = { viewModel.onEditProfile(it) }
+            binding.servers.onDuplicateServer = { viewModel.onDuplicateProfile(it) }
+            binding.servers.onDeleteServer = { viewModel.deleteProfile(it) }
+        }
+
         binding.servers.onCopyServerHost = { activity.setClipboardTextWithNotification(it.host) }
 
         binding.servers.setSource(activity, viewModel.serverProfiles, viewModel.rediscoveredProfiles)
