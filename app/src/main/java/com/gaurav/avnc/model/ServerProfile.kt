@@ -186,20 +186,7 @@ data class ServerProfile(
         var sshUsername: String = "",
         var sshAuthType: Int = SSH_AUTH_KEY,
         var sshPassword: String = "",
-        var sshPrivateKey: String = "",
-
-        /**
-         * True if this profile comes from an EMM/MDM configuration.
-         * Managed profiles are neither editable nor deletable from the UI.
-         */
-        var isManaged: Boolean = false,
-
-        /**
-         * Stable identifier provided by the EMM (key "id" of the managed_server bundle).
-         * Null for profiles created manually by the user.
-         * Used to match existing EMM profiles during resync (upsert) without duplicating rows.
-         */
-        var managedId: String? = null
+        var sshPrivateKey: String = ""
 
 ) : Parcelable {
 
@@ -258,22 +245,4 @@ data class ServerProfile(
      * Simply checks for non-zero [ID]
      */
     fun isSaved() = (ID != 0L)
-
-    /**
-     * Merges EMM-controlled fields from [provided] into this profile.
-     * Preserves: ID, isManaged, managedId, useCount, sshPrivateKey, zoom, gestures, etc.
-     * Only fields in the EMM allowlist are overwritten.
-     */
-    fun mergeFromManaged(provided: ServerProfile) {
-        name = provided.name.ifEmpty { host }
-        host = provided.host
-        port = provided.port
-        securityType = provided.securityType
-        channelType = provided.channelType
-        sshHost = provided.sshHost
-        sshPort = provided.sshPort
-        sshUsername = provided.sshUsername
-        sshAuthType = provided.sshAuthType
-        viewMode = provided.viewMode
-    }
 }

@@ -107,10 +107,10 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
 
         launchImportExport {
             // Serialize
-        val data = Container(
-                profiles = if (exportProfiles) serverProfileDao.getList().filter { !it.isManaged } else emptyList(),
-                preferences = if (exportSettings) collectPreferences() else emptyMap()
-        )
+            val data = Container(
+                    profiles = if (exportProfiles) serverProfileDao.getList() else emptyList(),
+                    preferences = if (exportSettings) collectPreferences() else emptyMap()
+            )
 
             if (!exportSecrets)
                 data.profiles = scrubSecrets(data.profiles)
@@ -229,7 +229,7 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
 
         // Serialize
         val data = Container(
-                profiles = if (exportProfiles) serverProfileDao.getList().filter { !it.isManaged } else emptyList(),
+                profiles = if (exportProfiles) serverProfileDao.getList() else emptyList(),
                 preferences = if (exportSettings) collectPreferences() else emptyMap()
         )
 
@@ -251,10 +251,6 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         //This is where migrations would be applied (if required in future)
 
         if (data.profiles.isNotEmpty()) {
-            data.profiles.forEach {
-                it.isManaged = false
-                it.managedId = null
-            }
             if (deleteCurrentServers) {
                 db.withTransaction {
                     serverProfileDao.deleteAll()

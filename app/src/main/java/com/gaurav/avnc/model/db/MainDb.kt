@@ -16,7 +16,6 @@ import androidx.room.RenameColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.gaurav.avnc.model.ServerProfile
 
@@ -26,7 +25,7 @@ import com.gaurav.avnc.model.ServerProfile
     AutoMigration(from = 3, to = 4),                                          // in v2.2.2
     AutoMigration(from = 4, to = 5, spec = MainDb.MigrationSpec4to5::class),  // in v2.3.0
     AutoMigration(from = 5, to = 6),                                          // in v2.x.x
-    AutoMigration(from = 6, to = 7, spec = MainDb.MigrationSpec6to7::class),  // in v3.0.0
+    AutoMigration(from = 6, to = 7, spec = MainDb.MigrationSpec6to7::class),  // in v3.0.0                                          // in v2.x.x
 ])
 abstract class MainDb : RoomDatabase() {
     abstract val serverProfileDao: ServerProfileDao
@@ -35,7 +34,7 @@ abstract class MainDb : RoomDatabase() {
         /**
          * Current database version
          */
-        const val VERSION = 8
+        const val VERSION = 7
 
         private var instance: MainDb? = null
 
@@ -46,9 +45,7 @@ abstract class MainDb : RoomDatabase() {
         @Synchronized
         fun getInstance(context: Context): MainDb {
             if (instance == null) {
-                instance = Room.databaseBuilder(context, MainDb::class.java, "main")
-                        .addMigrations(MigrationSpec7to8())
-                        .build()
+                instance = Room.databaseBuilder(context, MainDb::class.java, "main").build()
             }
             return instance!!
         }
@@ -75,12 +72,4 @@ abstract class MainDb : RoomDatabase() {
     @RenameColumn(tableName = "profiles", fromColumnName = "viewOnly", toColumnName = "viewMode")
     @DeleteColumn(tableName = "profiles", columnName = "sshPrivateKeyPassword")
     class MigrationSpec6to7 : AutoMigrationSpec
-
-    // Added in v3.1.0 — managed server profiles
-    class MigrationSpec7to8 : Migration(7, 8) {
-        override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL("ALTER TABLE profiles ADD COLUMN isManaged INTEGER NOT NULL DEFAULT 0")
-            db.execSQL("ALTER TABLE profiles ADD COLUMN managedId TEXT DEFAULT NULL")
-        }
-    }
 }
