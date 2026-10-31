@@ -107,6 +107,7 @@ private class ServerListViewHolder(val serverList: ServerList, val binding: Serv
 
     fun bind(profile: ServerProfile) {
         binding.profile = profile
+        binding.canSave = serverList.onSaveServer != null
         serverList.indicatorSource?.let { binding.indicator.setup(profile, it) }
     }
 

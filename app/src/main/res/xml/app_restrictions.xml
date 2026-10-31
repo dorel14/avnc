@@ -26,6 +26,13 @@
         android:title="@string/pref_ui">
 
         <restriction
+            android:defaultValue="false"
+            android:description="@string/restriction_lock_settings_desc"
+            android:key="lock_settings"
+            android:restrictionType="bool"
+            android:title="@string/restriction_lock_settings_title" />
+
+        <restriction
             android:defaultValue=""
             android:entries="@array/restriction_theme_entries"
             android:entryValues="@array/restriction_theme_values"
@@ -333,6 +340,27 @@
             android:key="lock_saved_server"
             android:restrictionType="choice"
             android:title="@string/pref_saved_server_lock" />
+
+        <restriction
+            android:defaultValue="false"
+            android:description="@string/restriction_lock_servers_desc"
+            android:key="lock_servers"
+            android:restrictionType="bool"
+            android:title="@string/restriction_lock_servers_title" />
+    </restriction>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tools ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <restriction
+        android:key="tools"
+        android:restrictionType="bundle"
+        android:title="@string/pref_tools">
+
+        <restriction
+            android:defaultValue="false"
+            android:description="@string/restriction_lock_import_export_desc"
+            android:key="lock_import_export"
+            android:restrictionType="bool"
+            android:title="@string/restriction_lock_import_export_title" />
     </restriction>
 
 </restrictions>

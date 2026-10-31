@@ -17,6 +17,10 @@
         <variable
             name="profile"
             type="com.gaurav.avnc.model.ServerProfile" />
+
+        <variable
+            name="canSave"
+            type="boolean" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -122,7 +126,7 @@
             android:layout_gravity="end|center_vertical"
             android:contentDescription="@string/desc_save_discovered_server_btn"
             android:src="@drawable/ic_plus"
-            app:isVisible="@{!profile.saved}" />
+            app:isVisible="@{canSave &amp;&amp; !profile.saved}" />
 
     </com.google.android.material.card.MaterialCardView>
 </layout>

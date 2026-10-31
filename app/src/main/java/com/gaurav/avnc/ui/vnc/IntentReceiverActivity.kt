@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.gaurav.avnc.R
 import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.model.db.MainDb
+import com.gaurav.avnc.util.ManagedConfig
 import com.gaurav.avnc.vnc.VncUri
 import kotlinx.coroutines.launch
 
@@ -95,7 +96,7 @@ class IntentReceiverActivity : AppCompatActivity() {
     }
 
     private suspend fun saveVncUri(uri: VncUri) {
-        if (!uri.saveConnection)
+        if (!uri.saveConnection || ManagedConfig.obtain(this).lockServers)
             return
 
         val profile = findAndMergeMatchingProfile(uri) ?: uri.toServerProfile()

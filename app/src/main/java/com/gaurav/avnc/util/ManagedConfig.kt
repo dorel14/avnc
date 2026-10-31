@@ -17,6 +17,8 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 
 /**
  * Provides access to managed configuration (a.k.a. app restrictions) pushed by
@@ -96,7 +98,30 @@ class ManagedConfig private constructor(context: Context) {
         }
     }
 
+    /**
+     * If true, user should not be able to change any setting.
+     */
+    val lockSettings get() = getBoolean(KEY_LOCK_SETTINGS, false)
+
+    /**
+     * If true, user should not be able to create, modify, delete or import server profiles.
+     */
+    val lockServers get() = getBoolean(KEY_LOCK_SERVERS, false)
+
+    /**
+     * If true, user should not be able to import or export anything.
+     * Also true if servers are locked, as they could be modified via import.
+     */
+    val lockImportExport get() = lockServers || getBoolean(KEY_LOCK_IMPORT_EXPORT, false)
+
+    val liveLockServers by lazy { liveRestrictions.map { lockServers }.distinctUntilChanged() }
+    val liveLockImportExport by lazy { liveRestrictions.map { lockImportExport }.distinctUntilChanged() }
+
     companion object {
+        const val KEY_LOCK_SETTINGS = "lock_settings"
+        const val KEY_LOCK_SERVERS = "lock_servers"
+        const val KEY_LOCK_IMPORT_EXPORT = "lock_import_export"
+
         @Volatile
         private var instance: ManagedConfig? = null
 

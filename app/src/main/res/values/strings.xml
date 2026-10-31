@@ -284,4 +284,11 @@
     <string name="restriction_option_user_defined">Defined by user</string>
     <string name="restriction_option_enabled">Enabled</string>
     <string name="restriction_option_disabled">Disabled</string>
+    <string name="restriction_lock_settings_title">Lock settings</string>
+    <string name="restriction_lock_settings_desc">Prevent user from changing any setting. Imported settings are ignored.</string>
+    <string name="restriction_lock_servers_title">Lock servers</string>
+    <string name="restriction_lock_servers_desc">Prevent user from adding, editing, duplicating, deleting or importing servers.</string>
+    <string name="restriction_lock_import_export_title">Disable Import/Export</string>
+    <string name="restriction_lock_import_export_desc">Prevent user from importing or exporting settings and servers.</string>
+    <string name="msg_import_export_locked">Import/Export is disabled by your organization</string>
 </resources>

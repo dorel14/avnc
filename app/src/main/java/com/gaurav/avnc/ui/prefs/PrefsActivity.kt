@@ -15,10 +15,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.DialogPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
+import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
+import androidx.preference.TwoStatePreference
 import com.gaurav.avnc.R
 import com.gaurav.avnc.util.DeviceAuthPrompt
 import com.gaurav.avnc.util.EdgeToEdgeHelper
@@ -95,8 +98,13 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
 
         /**
          * Returns true if value of [pref] is enforced by managed configuration.
+         * If settings are locked, all preferences holding a value are considered managed.
+         * Other preferences (e.g. links to other screens) are left untouched.
          */
-        protected fun isManaged(pref: Preference) = pref.key?.let { managedConfig.isManaged(it) } == true
+        protected fun isManaged(pref: Preference): Boolean {
+            val holdsValue = pref is DialogPreference || pref is TwoStatePreference || pref is SeekBarPreference
+            return (managedConfig.lockSettings && holdsValue) || pref.key?.let { managedConfig.isManaged(it) } == true
+        }
 
         private fun disableManagedPrefs(group: PreferenceGroup) {
             for (i in 0 until group.preferenceCount) {

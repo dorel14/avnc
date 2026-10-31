@@ -25,6 +25,14 @@
         android:weightSum="1">
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/padding_small"
+            android:text="@string/msg_import_export_locked"
+            android:visibility="gone"
+            app:isVisible="@{viewModel.importExportLocked}" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_export"
@@ -64,7 +72,7 @@
             android:id="@+id/export_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="@{viewModel.exportSettings || viewModel.exportProfiles}"
+            android:enabled="@{!viewModel.importExportLocked &amp;&amp; (viewModel.exportSettings || viewModel.exportProfiles)}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_export_file"
@@ -79,7 +87,7 @@
             android:id="@+id/export_qr_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="@{viewModel.exportSettings || viewModel.exportProfiles}"
+            android:enabled="@{!viewModel.importExportLocked &amp;&amp; (viewModel.exportSettings || viewModel.exportProfiles)}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_export_qr"
@@ -124,6 +132,7 @@
             android:id="@+id/import_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="@{!viewModel.importExportLocked}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_import_file"
@@ -138,6 +147,7 @@
             android:id="@+id/import_qr_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:enabled="@{!viewModel.importExportLocked}"
             android:paddingHorizontal="30dp"
             android:paddingVertical="@dimen/padding_normal"
             android:text="@string/title_import_qr"

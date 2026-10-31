@@ -13,6 +13,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gaurav.avnc.model.db.MainDb
 import com.gaurav.avnc.util.AppPreferences
+import com.gaurav.avnc.util.ManagedConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,8 @@ open class BaseViewModel(val app: Application) : AndroidViewModel(app) {
     protected val serverProfileDao by lazy { db.serverProfileDao }
 
     val pref by lazy { AppPreferences(app) }
+
+    protected val managedConfig by lazy { ManagedConfig.obtain(app) }
 
     /**
      * Launches [block] in [viewModelScope], on Main dispatcher.

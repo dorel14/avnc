@@ -67,6 +67,11 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
     val importExportFinishedEvent = LiveEvent<Result<String>>()
 
     /**
+     * True if Import/Export is disabled by managed configuration.
+     */
+    val importExportLocked by lazy { managedConfig.liveLockImportExport }
+
+    /**
      * Exports data to given [uri].
      */
     fun export(uri: Uri) {
@@ -159,6 +164,7 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
     private fun launchImportExport(block: suspend () -> String) {
         launchIO {
             runCatching {
+                check(!managedConfig.lockImportExport) { app.getString(R.string.msg_import_export_locked) }
                 block()
             }.let {
                 importExportFinishedEvent.fireAsync(it)
@@ -212,7 +218,10 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         }
 
         // Replay app preferences (best-effort, unknown keys are ignored)
-        applyPreferences(data.preferences)
+        if (managedConfig.lockSettings)
+            Log.i("PrefsViewModel", "Settings are locked by managed configuration, ignoring imported preferences")
+        else
+            applyPreferences(data.preferences)
     }
 
     /**

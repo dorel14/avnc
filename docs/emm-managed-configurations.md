@@ -1,7 +1,7 @@
 # Managed configurations (EMM/MDM)
 
 AVNC supports [managed configurations](https://developer.android.com/work/managed-configurations),
-allowing an EMM/MDM solution to enforce settings
+allowing an EMM/MDM solution to enforce settings and lock parts of the app
 on managed devices.
 
 The schema is declared in [`app_restrictions.xml`](../app/src/main/res/xml/app_restrictions.xml).
@@ -15,9 +15,9 @@ Changes pushed by the EMM are applied immediately, without restarting the app.
   which leaves it to the user. Any other value is enforced: it takes precedence over the
   user preference, and the setting is disabled in AVNC, with the summary "Managed by your organization".
 - **Booleans** are `choice` restrictions with values `true` / `false` (plus the empty value),
-  so that "Defined by user" can be selected.
+  so that "Defined by user" can be selected. Locks are the only plain `bool` restrictions.
 - **Sections**: Restrictions are grouped in `bundle` restrictions matching AVNC Settings screens
-  (`interface`, `viewer`, `input`, `servers`). Groups are only used for presentation,
+  (`interface`, `viewer`, `input`, `servers`, `tools`). Groups are only used for presentation,
   so AVNC also accepts a flat configuration (e.g. `gesture_style` at top level).
   Keys are unique across all sections.
 - **Invalid values** are ignored, as if the setting was "Defined by user".
@@ -117,13 +117,25 @@ Custom virtual keys layout ("Customize virtual keys") is not supported, as it us
 | `auto_reconnect`    | Reconnect automatically  | `true`, `false` |
 | `lock_saved_server` | Lock saved servers       | `true`, `false` |
 
+## Locks
+
+These are `bool` restrictions, `false` by default.
+
+| Key                  | Section     | Effect when `true`                                                                 |
+|----------------------|-------------|------------------------------------------------------------------------------------|
+| `lock_settings`      | `interface` | All preferences are disabled in Settings. Preferences contained in imported files are ignored. |
+| `lock_servers`       | `servers`   | Servers can't be added, edited, duplicated, deleted or imported. `vnc://` URIs can still be used to connect, but are never saved. |
+| `lock_import_export` | `tools`     | Import/Export (file & QR code) is disabled. Also implied by `lock_servers`.        |
+
+Connecting to servers is always allowed. Runtime state of a server (e.g. zoom level) is still saved.
+
 ## Example
 
 This is an example in the Android Enterprise JSON format (`ManagedConfiguration` of the
 Google Play EMM API), which is accepted by the JSON editor of several EMMs.
 Some EMMs use their own format, but keys, types and values are always the same.
 
-It enforces the dark theme and touchpad gestures.
+It enforces the dark theme and touchpad gestures, and locks servers.
 
 ```json
 {
@@ -138,6 +150,9 @@ It enforces the dark theme and touchpad gestures.
         { "key": "gesture_style", "valueString": "touchpad" },
         { "key": "gesture_swipe_sensitivity", "valueInteger": 12 }
       ]}}
+    ]}},
+    { "key": "servers", "valueBundle": { "managedProperty": [
+      { "key": "lock_servers", "valueBool": true }
     ]}}
   ]
 }

@@ -30,6 +30,12 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
     }
 
     /**
+     * True if server profiles are locked by managed configuration.
+     * UI should hide actions which modify profiles.
+     */
+    val serversLocked by lazy { managedConfig.liveLockServers }
+
+    /**
      * Used to find new servers.
      */
     val discovery = Discovery
@@ -106,11 +112,20 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      * given to [editProfileEvent] can be modified by the editor.
      **************************************************************************/
 
-    fun onNewProfile() = editProfileEvent.fire(ServerProfile())
-    fun onNewProfile(source: ServerProfile) = editProfileEvent.fire(source.copy(ID = 0))
-    fun onEditProfile(profile: ServerProfile) = editProfileEvent.fire(profile.copy())
+    fun onNewProfile() {
+        if (!managedConfig.lockServers) editProfileEvent.fire(ServerProfile())
+    }
+
+    fun onNewProfile(source: ServerProfile) {
+        if (!managedConfig.lockServers) editProfileEvent.fire(source.copy(ID = 0))
+    }
+
+    fun onEditProfile(profile: ServerProfile) {
+        if (!managedConfig.lockServers) editProfileEvent.fire(profile.copy())
+    }
 
     fun onDuplicateProfile(profile: ServerProfile) {
+        if (managedConfig.lockServers) return
         val duplicate = profile.copy(ID = 0)
         duplicate.name += " (Copy)"
         editProfileEvent.fire(duplicate)
@@ -123,11 +138,13 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
      **************************************************************************/
 
     fun saveProfile(profile: ServerProfile) = launchMain {
+        if (managedConfig.lockServers) return@launchMain
         serverProfileDao.save(profile)
         profileSavedEvent.fire(profile)
     }
 
     fun deleteProfile(profile: ServerProfile) = launchMain {
+        if (managedConfig.lockServers) return@launchMain
         serverProfileDao.delete(profile)
         profileDeletedEvent.fire(profile)
     }

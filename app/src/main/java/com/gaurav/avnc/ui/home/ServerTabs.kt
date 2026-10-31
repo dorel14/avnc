@@ -103,10 +103,17 @@ class ServerTabs(val activity: HomeActivity) {
         binding.viewModel = viewModel
 
         binding.servers.onServerClick = { viewModel.startConnection(it) }
-        binding.servers.onEditServer = { viewModel.onEditProfile(it) }
-        binding.servers.onDuplicateServer = { viewModel.onDuplicateProfile(it) }
-        binding.servers.onDeleteServer = { viewModel.deleteProfile(it) }
         binding.servers.onCopyServerHost = { activity.setClipboardTextWithNotification(it.host) }
+
+        // Context menu is built on demand, so it will reflect current lock state
+        val onEdit: ServerListItemAction = { viewModel.onEditProfile(it) }
+        val onDuplicate: ServerListItemAction = { viewModel.onDuplicateProfile(it) }
+        val onDelete: ServerListItemAction = { viewModel.deleteProfile(it) }
+        viewModel.serversLocked.observe(activity) { locked ->
+            binding.servers.onEditServer = onEdit.takeUnless { locked }
+            binding.servers.onDuplicateServer = onDuplicate.takeUnless { locked }
+            binding.servers.onDeleteServer = onDelete.takeUnless { locked }
+        }
 
         binding.servers.setSource(activity, viewModel.serverProfiles, viewModel.rediscoveredProfiles)
         return binding.root
@@ -119,9 +126,13 @@ class ServerTabs(val activity: HomeActivity) {
         binding.viewModel = viewModel
 
         binding.servers.onServerClick = { viewModel.startConnection(it) }
-        binding.servers.onSaveServer = { viewModel.onNewProfile(it) }
         binding.servers.onCopyServerName = { activity.setClipboardTextWithNotification(it.name) }
         binding.servers.onCopyServerHost = { activity.setClipboardTextWithNotification(it.host) }
+
+        val onSave: ServerListItemAction = { viewModel.onNewProfile(it) }
+        viewModel.serversLocked.observe(activity) { locked ->
+            binding.servers.onSaveServer = onSave.takeUnless { locked }
+        }
 
         binding.servers.setSource(activity, viewModel.discovery.servers)
         return binding.root
