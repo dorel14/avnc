@@ -16,6 +16,7 @@ import androidx.room.RenameColumn
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.gaurav.avnc.model.ServerProfile
 
@@ -34,7 +35,12 @@ abstract class MainDb : RoomDatabase() {
         /**
          * Current database version
          */
-        const val VERSION = 7
+        const val VERSION = 8
+
+        /**
+         * Manual migrations, these must also be given to MigrationTestHelper in tests.
+         */
+        val MANUAL_MIGRATIONS = arrayOf(MIGRATION_7_8)
 
         private var instance: MainDb? = null
 
@@ -45,7 +51,9 @@ abstract class MainDb : RoomDatabase() {
         @Synchronized
         fun getInstance(context: Context): MainDb {
             if (instance == null) {
-                instance = Room.databaseBuilder(context, MainDb::class.java, "main").build()
+                instance = Room.databaseBuilder(context, MainDb::class.java, "main")
+                        .addMigrations(*MANUAL_MIGRATIONS)
+                        .build()
             }
             return instance!!
         }
@@ -72,4 +80,14 @@ abstract class MainDb : RoomDatabase() {
     @RenameColumn(tableName = "profiles", fromColumnName = "viewOnly", toColumnName = "viewMode")
     @DeleteColumn(tableName = "profiles", columnName = "sshPrivateKeyPassword")
     class MigrationSpec6to7 : AutoMigrationSpec
+}
+
+// Managed server profiles.
+// A manual migration is used so that entity doesn't need SQL default values.
+private val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE profiles ADD COLUMN isManaged INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE profiles ADD COLUMN managedId TEXT")
+        db.execSQL("ALTER TABLE profiles ADD COLUMN managedFields TEXT NOT NULL DEFAULT ''")
+    }
 }

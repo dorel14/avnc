@@ -183,7 +183,8 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
 
         // Serialize
         val data = Container(
-                profiles = if (exportProfiles) serverProfileDao.getList() else emptyList(),
+                // Managed profiles are provided by managed configuration, no need to export them
+                profiles = if (exportProfiles) serverProfileDao.getList().filterNot { it.isManaged } else emptyList(),
                 preferences = if (exportSettings) collectPreferences() else emptyMap()
         )
 
@@ -205,9 +206,19 @@ class PrefsViewModel(app: Application) : BaseViewModel(app) {
         //This is where migrations would be applied (if required in future)
 
         if (data.profiles.isNotEmpty()) {
+            // Only managed configuration can create managed profiles
+            data.profiles.forEach {
+                it.isManaged = false
+                it.managedId = null
+                it.managedFields = ""
+            }
+
             if (deleteCurrentServers) {
                 db.withTransaction {
-                    serverProfileDao.deleteAll()
+                    // Managed profiles are kept, so their IDs can't be reused
+                    serverProfileDao.deleteAllUnmanaged()
+                    val managedIds = serverProfileDao.getManagedList().map { it.ID }.toSet()
+                    data.profiles.filter { it.ID in managedIds }.forEach { it.ID = 0 }
                     serverProfileDao.save(data.profiles)
                 }
             } else {

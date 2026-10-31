@@ -124,9 +124,12 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
         if (!managedConfig.lockServers) editProfileEvent.fire(profile.copy())
     }
 
+    /**
+     * Duplicate of a managed profile is a regular, editable profile.
+     */
     fun onDuplicateProfile(profile: ServerProfile) {
         if (managedConfig.lockServers) return
-        val duplicate = profile.copy(ID = 0)
+        val duplicate = profile.copy(ID = 0, isManaged = false, managedId = null, managedFields = "")
         duplicate.name += " (Copy)"
         editProfileEvent.fire(duplicate)
     }
@@ -139,12 +142,17 @@ class HomeViewModel(app: Application) : BaseViewModel(app) {
 
     fun saveProfile(profile: ServerProfile) = launchMain {
         if (managedConfig.lockServers) return@launchMain
-        serverProfileDao.save(profile)
+        // For managed profiles, fields controlled by managed configuration are not changed
+        if (profile.isManaged)
+            serverProfileDao.updateLocalState(profile)
+        else
+            serverProfileDao.save(profile)
         profileSavedEvent.fire(profile)
     }
 
     fun deleteProfile(profile: ServerProfile) = launchMain {
-        if (managedConfig.lockServers) return@launchMain
+        // Managed profiles can only be removed via managed configuration
+        if (managedConfig.lockServers || profile.isManaged) return@launchMain
         serverProfileDao.delete(profile)
         profileDeletedEvent.fire(profile)
     }

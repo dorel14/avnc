@@ -10,6 +10,7 @@ package com.gaurav.avnc.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
+import com.gaurav.avnc.model.ManagedField
 import com.gaurav.avnc.model.ServerProfile
 
 /**
@@ -39,6 +40,8 @@ class EditorViewModel(app: Application, state: SavedStateHandle, initialProfile:
     val sshUsePassword = state.getLiveData("sshUsePassword", profile.sshAuthType == ServerProfile.SSH_AUTH_PASSWORD)
     val sshUsePrivateKey = state.getLiveData("sshUsePrivateKey", profile.sshAuthType == ServerProfile.SSH_AUTH_KEY)
     val hasSshPrivateKey = state.getLiveData("hasSshPrivateKey", profile.sshPrivateKey.isNotBlank())
+
+    val imageQualityEnforced = profile.isEnforced(ManagedField.ImageQuality)
 
 
     fun prepareProfileForSave(): ServerProfile {

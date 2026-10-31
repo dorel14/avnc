@@ -12,6 +12,7 @@ import android.app.Application
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import com.gaurav.avnc.util.AppPreferences
+import com.gaurav.avnc.util.ManagedServerSync
 
 class App : Application() {
 
@@ -24,6 +25,8 @@ class App : Application() {
 
         prefs = AppPreferences(this)
         prefs.ui.theme.observeForever { updateNightMode(it) }
+
+        ManagedServerSync.start(this)
     }
 
     private fun updateNightMode(theme: String) {

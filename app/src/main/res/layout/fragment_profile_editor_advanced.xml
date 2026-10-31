@@ -251,7 +251,7 @@
                         android:layout_height="@dimen/action_btn_size"
                         android:layout_marginVertical="@dimen/margin_small"
                         android:layout_marginStart="@dimen/margin_large"
-                        android:enabled="@{!viewModel.useRawEncoding}"
+                        android:enabled="@{!viewModel.useRawEncoding &amp;&amp; !viewModel.imageQualityEnforced}"
                         android:max="9"
                         android:minHeight="@dimen/action_btn_size"
                         android:progress="@={viewModel.profile.imageQuality}"

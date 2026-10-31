@@ -100,7 +100,7 @@ class IntentReceiverActivity : AppCompatActivity() {
             return
 
         val profile = findAndMergeMatchingProfile(uri) ?: uri.toServerProfile()
-        if (profile.host.isBlank())
+        if (profile.host.isBlank() || profile.isManaged) // Managed profiles can't be modified
             return
 
         val id = profileDao.save(profile)

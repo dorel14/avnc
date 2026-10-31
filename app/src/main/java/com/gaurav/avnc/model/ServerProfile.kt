@@ -186,7 +186,25 @@ data class ServerProfile(
         var sshUsername: String = "",
         var sshAuthType: Int = SSH_AUTH_KEY,
         var sshPassword: String = "",
-        var sshPrivateKey: String = ""
+        var sshPrivateKey: String = "",
+
+        /**
+         * True if this profile is provided by managed configuration (EMM/MDM).
+         * Managed profiles can't be deleted by user, and some of their fields can't be edited.
+         */
+        var isManaged: Boolean = false,
+
+        /**
+         * Identifier of managed profile, as given in managed configuration.
+         * Used to match profiles during sync. It is null for non-managed profiles.
+         */
+        var managedId: String? = null,
+
+        /**
+         * Comma-separated keys of optional fields enforced by managed configuration.
+         * See [ManagedField].
+         */
+        var managedFields: String = ""
 
 ) : Parcelable {
 
@@ -245,4 +263,31 @@ data class ServerProfile(
      * Simply checks for non-zero [ID]
      */
     fun isSaved() = (ID != 0L)
+
+    /**
+     * Returns true if given optional field is enforced by managed configuration.
+     */
+    fun isEnforced(field: ManagedField) = isManaged && field.key in managedFields.split(',')
+
+    /**
+     * Copies fields controlled by managed configuration from [source]:
+     * fields which are always controlled, and optional fields enforced in [source].
+     * Other fields (e.g. zoom, remembered password) are left untouched.
+     */
+    fun copyManagedFieldsFrom(source: ServerProfile) {
+        managedFields = source.managedFields
+        ManagedField.entries.filter { source.isEnforced(it) }.forEach { it.copy(this, source) }
+
+        name = source.name
+        host = source.host
+        port = source.port
+        username = source.username
+        securityType = source.securityType
+        channelType = source.channelType
+        viewMode = source.viewMode
+        sshHost = source.sshHost
+        sshPort = source.sshPort
+        sshUsername = source.sshUsername
+        sshAuthType = source.sshAuthType
+    }
 }

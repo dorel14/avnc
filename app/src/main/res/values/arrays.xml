@@ -220,6 +220,64 @@
         <item>30</item>
     </string-array>
 
+    <!--Values for channel types & SSH auth types in managed configuration-->
+    <string-array name="restriction_channel_type_entries">
+        <item>TCP</item>
+        <item>SSH tunnel</item>
+    </string-array>
+    <string-array name="restriction_channel_type_values">
+        <item>tcp</item>
+        <item>ssh-tunnel</item>
+    </string-array>
+    <string-array name="restriction_ssh_auth_type_entries">
+        <item>Password</item>
+        <item>Private key</item>
+    </string-array>
+    <string-array name="restriction_ssh_auth_type_values">
+        <item>password</item>
+        <item>key</item>
+    </string-array>
+
+    <!--Optional fields of managed servers. Also uses restriction_bool_* and restriction_orientation_* (below).-->
+    <string-array name="restriction_server_gesture_style_entries">
+        <item>@string/restriction_option_user_defined</item>
+        <item>@string/pref_gesture_style_auto</item>
+        <item>@string/pref_gesture_style_touchscreen</item>
+        <item>@string/pref_gesture_style_touchpad</item>
+    </string-array>
+    <string-array name="restriction_server_gesture_style_values">
+        <item />
+        <item>auto</item>
+        <item>touchscreen</item>
+        <item>touchpad</item>
+    </string-array>
+    <string-array name="restriction_image_quality_entries">
+        <item>@string/restriction_option_user_defined</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+    <string-array name="restriction_image_quality_values">
+        <item />
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
 
     <!--Dummy string array used for testing-->
     <string-array name="dummy_array">

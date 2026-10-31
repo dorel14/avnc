@@ -18,6 +18,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gaurav.avnc.R
 import com.gaurav.avnc.model.LoginInfo
+import com.gaurav.avnc.model.ManagedField
 import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.session.Messenger
 import com.gaurav.avnc.session.RemoteSession
@@ -249,7 +250,7 @@ class VncViewModel(app: Application) : BaseViewModel(app) {
      */
     fun saveProfile() {
         if (profile.isSaved())
-            launchMain { serverProfileDao.update(profile) }
+            launchMain { serverProfileDao.updateLocalState(profile) }
     }
 
     suspend fun getProfileById(id: Long) = serverProfileDao.getByID(id)
@@ -373,7 +374,7 @@ class VncViewModel(app: Application) : BaseViewModel(app) {
      * Any change will be reflected in [activeGestureStyle].
      */
     fun setGestureStyle(newStyle: String) {
-        if (profile.gestureStyle != newStyle) {
+        if (profile.gestureStyle != newStyle && !profile.isEnforced(ManagedField.GestureStyle)) {
             profile.gestureStyle = newStyle
             saveProfile()
         }
@@ -396,6 +397,10 @@ class VncViewModel(app: Application) : BaseViewModel(app) {
     }
 
     fun setViewMode(newMode: Int) {
+        // View-only mode enforced by managed configuration can't be turned off
+        if (profile.isManaged && profile.viewMode == ServerProfile.VIEW_MODE_NO_INPUT && newMode != profile.viewMode)
+            return
+
         if (profile.viewMode != newMode) {
             profile.viewMode = newMode
             saveProfile()

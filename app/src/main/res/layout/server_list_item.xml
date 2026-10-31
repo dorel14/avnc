@@ -83,6 +83,12 @@
 
                 <ImageView
                     style="@style/ServerCardHintIcon"
+                    android:contentDescription="@string/msg_managed_by_organization"
+                    android:src="@drawable/ic_lock"
+                    app:isVisible="@{profile.managed}" />
+
+                <ImageView
+                    style="@style/ServerCardHintIcon"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_ssh"
                     app:isVisible="@{profile.channelType == ServerProfile.CHANNEL_SSH_TUNNEL}" />

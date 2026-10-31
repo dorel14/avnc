@@ -1,7 +1,7 @@
 # Managed configurations (EMM/MDM)
 
 AVNC supports [managed configurations](https://developer.android.com/work/managed-configurations),
-allowing an EMM/MDM solution to enforce settings and lock parts of the app
+allowing an EMM/MDM solution to enforce settings, lock parts of the app, and provision servers
 on managed devices.
 
 The schema is declared in [`app_restrictions.xml`](../app/src/main/res/xml/app_restrictions.xml).
@@ -129,13 +129,76 @@ These are `bool` restrictions, `false` by default.
 
 Connecting to servers is always allowed. Runtime state of a server (e.g. zoom level) is still saved.
 
+## Managed servers
+
+`managed_servers` (`bundle_array`) adds servers to the saved server list.
+Each entry is a bundle with the following keys.
+
+| Key             | Type    | Values / Notes                                                                 |
+|-----------------|---------|--------------------------------------------------------------------------------|
+| `id`            | string  | **Required.** Unique and stable identifier, used to keep servers in sync.      |
+| `host`          | string  | **Required.** Hostname or IP address.                                          |
+| `name`          | string  | Display name. Defaults to `host`.                                              |
+| `port`          | integer | `1` to `65535`. Default `5900`.                                                |
+| `username`      | string  | VNC username, if required by the security type.                                |
+| `security_type` | choice  | `0` Automatic (default), `1` None, `2` VncAuth, `18` AnonTLS, `19` VeNCrypt, `30` macOS |
+| `view_only`     | bool    | If `true`, input is disabled, and user can't turn it on.                       |
+
+SSH fields are grouped in an `ssh` sub-bundle ("SSH tunnel" in EMM consoles):
+
+| Key             | Type    | Values / Notes                                                  |
+|-----------------|---------|-----------------------------------------------------------------|
+| `channel_type`  | choice  | `tcp` (default, direct connection) or `ssh-tunnel`              |
+| `ssh_host`      | string  | Hostname or IP address of the SSH server.                       |
+| `ssh_port`      | integer | `1` to `65535`. Default `22`.                                   |
+| `ssh_username`  | string  | SSH username.                                                   |
+| `ssh_auth_type` | choice  | `password` (default) or `key`                                   |
+
+Optional fields are grouped in an `advanced` sub-bundle ("Advanced" in EMM consoles).
+Like preferences, each one is either enforced, or left to the user ("Defined by user").
+
+| Key                     | Setting in AVNC                       | Values                                         |
+|-------------------------|---------------------------------------|------------------------------------------------|
+| `gesture_style`         | Gesture style                         | `auto` (use global setting), `touchscreen`, `touchpad` |
+| `screen_orientation`    | Orientation                           | `auto` (use global setting), `portrait`, `landscape` |
+| `image_quality`         | Image quality                         | `0` (lowest) to `9` (highest)                  |
+| `use_raw_encoding`      | Raw                                   | `true`, `false`                                |
+| `resize_remote_desktop` | Resize remote session to local window | `true`, `false`                                |
+| `button_up_delay`       | Send delayed click events             | `true`, `false`                                |
+| `connect_on_app_start`  | Auto-connect when app starts          | `true`, `false`                                |
+| `enable_wol`            | Wake-on-LAN                           | `true`, `false`                                |
+| `wol_mac`               | MAC address                           | e.g. `AA:BB:CC:DD:EE:FF`. Empty = defined by user |
+| `wol_broadcast_address` | Broadcast address                     | e.g. `192.168.1.255`. Empty = defined by user  |
+| `wol_port`              | Wake-on-LAN port                      | `1` to `65535`. `0` = defined by user          |
+
+Entries without `id` or `host`, and duplicate `id`s, are ignored. At most 500 entries are used.
+
+Secrets (passwords & private keys) can't be provided by managed configuration.
+User is asked for the password when connecting, and can choose to remember it.
+For `ssh_auth_type = key`, user has to import the private key in server settings.
+
+### Behavior
+
+- Managed servers show a lock icon. They can't be deleted, but they can be
+  duplicated (unless `lock_servers` is set). The duplicate is a regular server.
+- Managed servers can be edited (unless `lock_servers` is set), but fields listed
+  above are read-only, as well as enforced optional fields. Other settings (e.g.
+  password, SSH private key, non-enforced optional fields) can be changed by user.
+- Servers are synced on app start, and whenever managed configuration changes.
+  The fields above are updated, while local state (zoom, gesture style, remembered
+  password, etc.) is kept. Servers removed from the list are deleted.
+- Managed servers are never exported. Imported servers are never managed, and
+  "Delete current servers" during import keeps managed servers.
+- A `vnc://` URI can be used to connect to a managed server, but it never modifies it.
+
 ## Example
 
 This is an example in the Android Enterprise JSON format (`ManagedConfiguration` of the
 Google Play EMM API), which is accepted by the JSON editor of several EMMs.
 Some EMMs use their own format, but keys, types and values are always the same.
 
-It enforces the dark theme and touchpad gestures, and locks servers.
+It enforces the dark theme and touchpad gestures, locks servers, and provisions one server
+whose gesture style is enforced, while other advanced settings are left to the user.
 
 ```json
 {
@@ -153,7 +216,19 @@ It enforces the dark theme and touchpad gestures, and locks servers.
     ]}},
     { "key": "servers", "valueBundle": { "managedProperty": [
       { "key": "lock_servers", "valueBool": true }
-    ]}}
+    ]}},
+    { "key": "managed_servers", "valueBundleArray": [
+      { "managedProperty": [
+        { "key": "id", "valueString": "office-pc" },
+        { "key": "name", "valueString": "Office PC" },
+        { "key": "host", "valueString": "192.168.1.10" },
+        { "key": "port", "valueInteger": 5900 },
+        { "key": "security_type", "valueString": "2" },
+        { "key": "advanced", "valueBundle": { "managedProperty": [
+          { "key": "gesture_style", "valueString": "touchpad" }
+        ]}}
+      ]}
+    ]}
   ]
 }
 ```

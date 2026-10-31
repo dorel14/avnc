@@ -363,4 +363,213 @@
             android:title="@string/restriction_lock_import_export_title" />
     </restriction>
 
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Managed servers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <restriction
+        android:description="@string/restriction_managed_servers_desc"
+        android:key="managed_servers"
+        android:restrictionType="bundle_array"
+        android:title="@string/restriction_managed_servers_title">
+
+        <restriction
+            android:key="managed_server"
+            android:restrictionType="bundle"
+            android:title="@string/restriction_managed_server_title">
+
+            <restriction
+                android:defaultValue=""
+                android:description="@string/restriction_server_id_desc"
+                android:key="id"
+                android:restrictionType="string"
+                android:title="@string/restriction_server_id_title" />
+
+            <restriction
+                android:defaultValue=""
+                android:description="@string/restriction_server_name_desc"
+                android:key="name"
+                android:restrictionType="string"
+                android:title="@string/restriction_server_name_title" />
+
+            <restriction
+                android:defaultValue=""
+                android:description="@string/restriction_server_host_desc"
+                android:key="host"
+                android:restrictionType="string"
+                android:title="@string/hint_host" />
+
+            <restriction
+                android:defaultValue="5900"
+                android:description="@string/restriction_server_port_desc"
+                android:key="port"
+                android:restrictionType="integer"
+                android:title="@string/hint_port" />
+
+            <restriction
+                android:defaultValue=""
+                android:description="@string/restriction_server_username_desc"
+                android:key="username"
+                android:restrictionType="string"
+                android:title="@string/hint_username" />
+
+            <restriction
+                android:defaultValue="0"
+                android:entries="@array/profile_editor_security_labels"
+                android:entryValues="@array/profile_editor_security_values"
+                android:key="security_type"
+                android:restrictionType="choice"
+                android:title="@string/title_vnc_security" />
+
+            <restriction
+                android:defaultValue="false"
+                android:description="@string/restriction_server_view_only_desc"
+                android:key="view_only"
+                android:restrictionType="bool"
+                android:title="@string/restriction_server_view_only_title" />
+
+            <!-- SSH tunnel -->
+            <restriction
+                android:key="ssh"
+                android:restrictionType="bundle"
+                android:title="@string/restriction_server_ssh_group_title">
+
+                <restriction
+                    android:defaultValue="tcp"
+                    android:entries="@array/restriction_channel_type_entries"
+                    android:entryValues="@array/restriction_channel_type_values"
+                    android:key="channel_type"
+                    android:restrictionType="choice"
+                    android:title="@string/restriction_server_channel_type_title" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_ssh_host_desc"
+                    android:key="ssh_host"
+                    android:restrictionType="string"
+                    android:title="@string/hint_ssh_host" />
+
+                <restriction
+                    android:defaultValue="22"
+                    android:description="@string/restriction_server_ssh_port_desc"
+                    android:key="ssh_port"
+                    android:restrictionType="integer"
+                    android:title="@string/hint_ssh_port" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_ssh_username_desc"
+                    android:key="ssh_username"
+                    android:restrictionType="string"
+                    android:title="@string/restriction_server_ssh_username_title" />
+
+                <restriction
+                    android:defaultValue="password"
+                    android:description="@string/restriction_server_ssh_auth_type_desc"
+                    android:entries="@array/restriction_ssh_auth_type_entries"
+                    android:entryValues="@array/restriction_ssh_auth_type_values"
+                    android:key="ssh_auth_type"
+                    android:restrictionType="choice"
+                    android:title="@string/restriction_server_ssh_auth_type_title" />
+            </restriction>
+
+            <!-- Advanced: optional fields, left to the user unless set (see ManagedField) -->
+            <restriction
+                android:key="advanced"
+                android:restrictionType="bundle"
+                android:title="@string/title_advanced">
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_server_gesture_style_entries"
+                    android:entryValues="@array/restriction_server_gesture_style_values"
+                    android:key="gesture_style"
+                    android:restrictionType="choice"
+                    android:title="@string/pref_gesture_style" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_orientation_entries"
+                    android:entryValues="@array/restriction_orientation_values"
+                    android:key="screen_orientation"
+                    android:restrictionType="choice"
+                    android:title="@string/title_orientation" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_image_quality_entries"
+                    android:entryValues="@array/restriction_image_quality_values"
+                    android:key="image_quality"
+                    android:restrictionType="choice"
+                    android:title="@string/title_image_quality" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_bool_entries"
+                    android:entryValues="@array/restriction_bool_values"
+                    android:key="use_raw_encoding"
+                    android:restrictionType="choice"
+                    android:title="@string/title_image_quality_raw" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_bool_entries"
+                    android:entryValues="@array/restriction_bool_values"
+                    android:key="resize_remote_desktop"
+                    android:restrictionType="choice"
+                    android:title="@string/title_resize_remote_desktop" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_bool_entries"
+                    android:entryValues="@array/restriction_bool_values"
+                    android:key="button_up_delay"
+                    android:restrictionType="choice"
+                    android:title="@string/title_button_up_delay" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_bool_entries"
+                    android:entryValues="@array/restriction_bool_values"
+                    android:key="connect_on_app_start"
+                    android:restrictionType="choice"
+                    android:title="@string/title_connect_on_app_start" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_optional_desc"
+                    android:entries="@array/restriction_bool_entries"
+                    android:entryValues="@array/restriction_bool_values"
+                    android:key="enable_wol"
+                    android:restrictionType="choice"
+                    android:title="@string/title_enable_wol" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_wol_mac_desc"
+                    android:key="wol_mac"
+                    android:restrictionType="string"
+                    android:title="@string/hint_wol_mac" />
+
+                <restriction
+                    android:defaultValue=""
+                    android:description="@string/restriction_server_wol_broadcast_address_desc"
+                    android:key="wol_broadcast_address"
+                    android:restrictionType="string"
+                    android:title="@string/hint_wol_address" />
+
+                <restriction
+                    android:defaultValue="0"
+                    android:description="@string/restriction_server_wol_port_desc"
+                    android:key="wol_port"
+                    android:restrictionType="integer"
+                    android:title="@string/restriction_server_wol_port_title" />
+            </restriction>
+        </restriction>
+    </restriction>
+
 </restrictions>

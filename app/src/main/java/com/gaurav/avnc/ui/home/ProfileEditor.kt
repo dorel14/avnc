@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.gaurav.avnc.R
 import com.gaurav.avnc.databinding.FragmentProfileEditorAdvancedBinding
 import com.gaurav.avnc.databinding.FragmentProfileEditorBinding
+import com.gaurav.avnc.model.ManagedField
 import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.util.MsgDialog
 import com.gaurav.avnc.util.OpenableDocument
@@ -70,7 +71,8 @@ import kotlinx.coroutines.withContext
 private const val PROFILE_KEY = "profile"
 
 fun startProfileEditor(host: FragmentActivity, profile: ServerProfile, preferAdvancedEditor: Boolean) {
-    if (preferAdvancedEditor)
+    // Simple editor mostly contains fields controlled by managed configuration
+    if (preferAdvancedEditor || profile.isManaged)
         startAdvancedProfileEditor(host, profile)
     else
         startSimpleProfileEditor(host, profile)
@@ -191,7 +193,37 @@ class AdvancedProfileEditor : Fragment() {
         setupNightModeNavBarColor()
         setupToolbarMenu()
 
+        if (viewModel.profile.isManaged)
+            disableManagedFields()
+
         return binding.root
+    }
+
+    /**
+     * Fields controlled by managed configuration can't be edited, see [ServerProfile.copyManagedFieldsFrom].
+     * Repeater is also disabled, because it changes the meaning of host.
+     * Image quality is handled in layout, as its enabled state is data-bound.
+     */
+    private fun disableManagedFields() {
+        binding.toolbar.subtitle = getString(R.string.msg_managed_by_organization)
+        with(binding) {
+            listOf(name, host, port, useRepeater, idOnRepeater, username, security,
+                   useSshTunnel, sshHost, sshPort, sshUsername, sshAuthTypeKey, sshAuthTypePassword)
+        }.forEach { it.isEnabled = false }
+
+        val optionalFields = with(binding) {
+            mapOf(ManagedField.GestureStyle to gestureStyle,
+                  ManagedField.ScreenOrientation to screenOrientation,
+                  ManagedField.RawEncoding to rawEncoding,
+                  ManagedField.ResizeRemoteDesktop to resizeRemoteDesktop,
+                  ManagedField.ButtonUpDelay to buttonUpDelay,
+                  ManagedField.ConnectOnAppStart to autoConnect,
+                  ManagedField.EnableWol to wol,
+                  ManagedField.WolMAC to wolMac,
+                  ManagedField.WolBroadcastAddress to wolBroadcastAddress,
+                  ManagedField.WolPort to wolPort)
+        }
+        optionalFields.filterKeys { viewModel.profile.isEnforced(it) }.values.forEach { it.isEnabled = false }
     }
 
     private fun setupHelpButton(button: View, title: Int, msg: Int) {
